@@ -1,0 +1,27 @@
+{
+  "skill_name": "security-audit",
+  "notes": "Each eval expects a fixture codebase with planted vulnerabilities. Use `evals/fixtures/` to house them (create per-eval on demand). Fixtures should be small (5-20 files) and realistic — a minimal library shape, not synthetic bug-per-file files. Expected output: a SECURITY_AUDIT.md report in the fixture directory, matching the structure in assets/report-template.md.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "node-http-client-library",
+      "prompt": "Harden this HTTP client library before we publish it. Target: Node 20+. Produce SECURITY_AUDIT.md in the repo root.",
+      "expected_output": "Report identifies: SSRF from caller-supplied URLs (missing private-IP check, redirect following, DNS rebinding hazard), header injection via user-supplied headers, credential leakage in thrown errors (URL with tokens), absence of `timingSafeEqual` in HMAC-verification helper, unbounded response body accumulation. Each finding has a concrete diff patch. Low-confidence or beginner-tier notes are absent.",
+      "files": ["evals/fixtures/node-http-client-library/"]
+    },
+    {
+      "id": 2,
+      "name": "browser-html-rendering-lib",
+      "prompt": "Do a pre-audit security review on this component library before the external auditors arrive next week.",
+      "expected_output": "Report identifies: innerHTML assignment from caller string (DOM XSS), javascript: URL not filtered in href helper, postMessage listener without origin check, prototype-pollution gadget in options merge, missing SameSite/HttpOnly on a cookie helper. Report tags CWEs, uses exploitability-first severity, proposes minimal diffs.",
+      "files": ["evals/fixtures/browser-html-rendering-lib/"]
+    },
+    {
+      "id": 3,
+      "name": "isomorphic-auth-lib",
+      "prompt": "Security audit this auth library. It's the primary login + session handling for consumers. Look for anything that would fail a professional audit.",
+      "expected_output": "Report identifies (at least): non-constant-time token compare, predictable session id via Math.random, JWT verifier not pinning algorithms (alg-none acceptance), missing rate-limit hook on OTP verify, short (96-bit) tokens, optional verify flag default that skips signature check, hard-coded fallback secret. Triage correctly flags the alg-none and hard-coded secret as Critical.",
+      "files": ["evals/fixtures/isomorphic-auth-lib/"]
+    }
+  ]
+}
