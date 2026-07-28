@@ -2,7 +2,8 @@
 name: qc
 description: >
   Ultra-compressed commit generator. Cuts noise from commit messages while preserving
-  intent and reasoning, then runs the commit. Conventional Commits format. Subject ≤50 chars,
+  intent and reasoning, then runs the commit. Splits unrelated changes into separate
+  commits so the working tree ends up clean. Conventional Commits format. Subject ≤50 chars,
   body only when "why" isn't obvious. Use when user says "write a commit", "commit message",
   "generate commit", "/commit", or invokes /qc.
 model: haiku
@@ -63,10 +64,17 @@ Always include body for: breaking changes, security fixes, data migrations, anyt
 
 ## Committing
 
-After writing the message, run the commit:
+The goal is a **clean working tree** — every change committed under a fitting message.
 
-- Check `git status` and `git diff --staged` first — the message must match what's actually staged
-- Nothing staged: ask before staging; never `git add -A` blindly
+1. Survey everything first: `git status` and `git diff` (and `git diff --staged`). Account for staged, unstaged, and untracked files.
+2. Decide whether it's one logical change or several unrelated ones (see **Splitting** below).
+3. For each logical unit, stage exactly its files, write its message, commit.
+4. Re-check `git status` at the end — the tree must be clean (nothing left uncommitted). If anything remains, it belongs to a commit you missed; go back to step 2.
+
+Rules for each commit:
+
+- The message must match what's actually staged for *that* commit — verify with `git diff --staged` before committing
+- Never `git add -A` blindly when the changes are unrelated — stage per group with explicit paths
 - Commit with a heredoc to preserve formatting:
   ```bash
   git commit -m "$(cat <<'EOF'
@@ -75,8 +83,27 @@ After writing the message, run the commit:
   )"
   ```
 - Never `--no-verify`, never `--amend`, never rewrite history
-- Show the resulting `git log -1 --stat` as confirmation
+
+## Splitting
+
+When the changes clearly belong to more than one concern, commit them **separately** — one commit per logical unit — rather than one mixed commit.
+
+Signs the changes are unrelated:
+- Different types (`feat` here, unrelated `fix`/`chore`/`docs` there)
+- Touch unrelated modules, features, or scopes with no shared reason
+- A cleanup or formatting drive-by riding along with a feature
+- Bumping deps / config alongside actual logic changes
+
+How to split:
+- Group files (or hunks, via `git add -p` when a single file mixes concerns) by concern
+- Stage one group with explicit paths, commit it, then the next — smallest independent units, ideally each buildable on its own
+- Order commits so dependencies land first (e.g. the refactor before the feature that uses it)
+- When it's genuinely one coherent change, don't over-split — a single commit is correct
+
+If grouping is ambiguous (a change could plausibly belong to two units), state your proposed grouping and commit it; don't stall waiting for confirmation unless the user asked to review first.
+
+Show `git log --oneline -n <count>` (and `git status` proving the tree is clean) as confirmation once all commits are made.
 
 ## Boundaries
 
-Generates the message and runs `git commit`. Does not push, does not amend. "stop caveman-commit" or "normal mode": revert to verbose commit style.
+Generates messages and runs `git commit` — one or several as needed to clear the tree. Does not push, does not amend. "stop caveman-commit" or "normal mode": revert to verbose, single-commit style.
