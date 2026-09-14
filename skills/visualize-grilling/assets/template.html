@@ -1,0 +1,289 @@
+<title>{{TITLE}}</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --paper: #f4f5f3;
+    --panel: #ffffff;
+    --ink: #17191c;
+    --ink-2: #4a5058;
+    --ink-3: #8a919b;
+    --line: #d9dcd8;
+    --line-2: #eceeea;
+    --accent: #2456c8;
+    --accent-ink: #ffffff;
+    --accent-soft: #e6ecfb;
+    --fact: #e9eef0;
+    --fact-ink: #2d3a44;
+    --ok: #1f7a4d;
+    --code: #eef0ec;
+    --sans: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+    --cond: "IBM Plex Sans Condensed", "Arial Narrow", "Helvetica Neue", sans-serif;
+    --mono: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #131518;
+      --panel: #1b1e22;
+      --ink: #ecedee;
+      --ink-2: #b4b9c0;
+      --ink-3: #737a84;
+      --line: #2f343a;
+      --line-2: #24282d;
+      --accent: #7c9cff;
+      --accent-ink: #0c1330;
+      --accent-soft: #1e2740;
+      --fact: #20262b;
+      --fact-ink: #c7d0d8;
+      --ok: #5fc98f;
+      --code: #101215;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #131518;
+    --panel: #1b1e22;
+    --ink: #ecedee;
+    --ink-2: #b4b9c0;
+    --ink-3: #737a84;
+    --line: #2f343a;
+    --line-2: #24282d;
+    --accent: #7c9cff;
+    --accent-ink: #0c1330;
+    --accent-soft: #1e2740;
+    --fact: #20262b;
+    --fact-ink: #c7d0d8;
+    --ok: #5fc98f;
+    --code: #101215;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  a { color: var(--accent); }
+  code, pre, textarea.out { font-family: var(--mono); }
+  code { font-size: 0.88em; background: var(--code); padding: 0.05em 0.35em; border-radius: 3px; }
+
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 32px 24px 120px; display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 40px; }
+  @media (max-width: 800px) { .wrap { grid-template-columns: 1fr; gap: 24px; } .toc { position: static !important; } }
+
+  header.top { grid-column: 1 / -1; border-bottom: 1px solid var(--line); padding-bottom: 20px; }
+  .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+  h1 { font-family: var(--cond); font-weight: 600; font-size: 34px; line-height: 1.1; margin: 6px 0 10px; text-wrap: balance; }
+  .lede { color: var(--ink-2); max-width: 62ch; margin: 0; }
+
+  .toc { position: sticky; top: 24px; align-self: start; }
+  .toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  .toc a { display: flex; gap: 10px; align-items: baseline; text-decoration: none; color: var(--ink-2); padding: 6px 8px; border-radius: 4px; font-size: 13.5px; }
+  .toc a:hover { background: var(--panel); }
+  .toc .k { font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); width: 22px; flex: none; }
+  .toc .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--line); flex: none; margin-left: auto; }
+  .toc a.done .dot { background: var(--ok); }
+  .toc .sep { border-top: 1px solid var(--line); margin: 8px 0; }
+
+  main { display: flex; flex-direction: column; gap: 28px; min-width: 0; }
+
+  .facts { background: var(--fact); color: var(--fact-ink); border-radius: 6px; padding: 16px 18px; }
+  .facts h2 { font-family: var(--cond); font-size: 16px; margin: 0 0 8px; font-weight: 600; letter-spacing: 0.01em; }
+  .facts ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
+
+  .q { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 20px 22px 18px; scroll-margin-top: 20px; }
+  .q-head { display: flex; gap: 14px; align-items: baseline; margin-bottom: 4px; }
+  .q-head .k { font-family: var(--mono); font-size: 12px; color: var(--accent); font-weight: 500; }
+  .q-head h2 { font-family: var(--cond); font-size: 21px; font-weight: 600; margin: 0; }
+  .q-head .kind { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--ink-3); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+  .q p.body { margin: 0 0 14px; color: var(--ink-2); max-width: 66ch; }
+
+  .opts { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+  .opt { display: grid; grid-template-columns: 18px 1fr; gap: 12px; align-items: start; padding: 10px 12px; border: 1px solid var(--line-2); border-radius: 5px; cursor: pointer; }
+  .opt:hover { border-color: var(--line); }
+  .opt:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+  .opt:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .opt input { margin: 4px 0 0; accent-color: var(--accent); width: 16px; height: 16px; }
+  .opt .t { font-weight: 500; }
+  .opt .d { color: var(--ink-2); font-size: 13.5px; }
+  .opt .rec { display: inline-block; margin-left: 8px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); border: 1px solid var(--accent); border-radius: 3px; padding: 0 5px; vertical-align: 2px; }
+
+  .note { margin-top: 12px; display: grid; gap: 4px; }
+  .note label { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+  .note textarea, textarea.out { width: 100%; border: 1px solid var(--line); border-radius: 4px; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 14px; padding: 8px 10px; resize: vertical; min-height: 40px; }
+  .note textarea:focus, textarea.out:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: transparent; }
+
+  .out-sec { background: var(--panel); border: 1px solid var(--accent); border-radius: 6px; padding: 20px 22px; scroll-margin-top: 20px; }
+  .out-sec h2 { font-family: var(--cond); font-size: 21px; font-weight: 600; margin: 0 0 4px; }
+  .out-sec p { margin: 0 0 12px; color: var(--ink-2); }
+  textarea.out { font-family: var(--mono); font-size: 13px; min-height: 260px; line-height: 1.5; white-space: pre; overflow: auto; }
+  .row { display: flex; gap: 10px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+  button { font: inherit; font-weight: 500; border-radius: 4px; padding: 8px 14px; cursor: pointer; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+  button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .status { font-family: var(--mono); font-size: 12.5px; color: var(--ink-3); }
+  .status.ok { color: var(--ok); }
+
+  .bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--panel); border-top: 1px solid var(--line); padding: 10px 24px; display: flex; gap: 16px; align-items: center; font-size: 13.5px; }
+  .bar .prog { flex: 1; height: 4px; background: var(--line-2); border-radius: 2px; overflow: hidden; max-width: 320px; }
+  .bar .prog i { display: block; height: 100%; background: var(--accent); width: 0; transition: width 200ms; }
+  .bar .cnt { font-family: var(--mono); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  .bar a { margin-left: auto; text-decoration: none; font-weight: 500; }
+  @media (prefers-reduced-motion: reduce) { .bar .prog i { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">{{SUBJECT}} · round {{ROUND}}</div>
+    <h1>{{TITLE}}</h1>
+    <p class="lede">{{LEDE}}</p>
+  </header>
+
+  <nav class="toc" aria-label="Questions">
+    <ol id="toc"></ol>
+    <div class="sep"></div>
+    <ol><li><a href="#out"><span class="k">→</span>Compiled answers</a></li></ol>
+  </nav>
+
+  <main>
+    <section class="facts">
+      <h2>Facts already settled from the codebase</h2>
+      <ul>
+        <!-- FACTS: one <li> per settled fact. Delete the whole <section class="facts"> if none. -->
+        <li>{{FACT}}</li>
+      </ul>
+    </section>
+
+    <div id="questions"></div>
+
+    <section class="out-sec" id="out">
+      <h2>Compiled answers</h2>
+      <p>Updates as you pick. Copy and paste this block back into the chat.</p>
+      <textarea class="out" id="output" readonly aria-label="Compiled answers"></textarea>
+      <div class="row">
+        <button class="primary" id="copy">Copy answers</button>
+        <button id="reset">Reset to recommended</button>
+        <span class="status" id="status"></span>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="bar">
+  <span class="cnt" id="cnt">0 / 7 answered</span>
+  <div class="prog"><i id="prog"></i></div>
+  <a href="#out">Jump to answers ↓</a>
+</div>
+
+<script>
+  // QUESTIONS: one entry per frontier question. `rec: true` marks the recommended pick (preselected).
+  // `multi: true` renders checkboxes, else radios. Keep ids Q1..Qn matching the chat round.
+  const QUESTIONS = [
+    {
+      id: "Q1", title: "{{QUESTION TITLE}}", multi: false,
+      body: "{{Question body. Plain text, no markdown.}}",
+      options: [
+        { v: "a", t: "{{Option label}}", d: "{{One-line consequence or trade-off.}}", rec: true },
+        { v: "b", t: "{{Option label}}", d: "{{One-line consequence or trade-off.}}" },
+      ],
+    },
+  ];
+
+  const KEY = "{{SLUG}}-round-{{ROUND}}";
+  const state = load();
+
+  function load() {
+    try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s) return s; } catch (e) {}
+    return defaults();
+  }
+  function defaults() {
+    const s = {};
+    for (const q of QUESTIONS) s[q.id] = { picks: q.options.filter(o => o.rec).map(o => o.v), note: "" };
+    return s;
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+  const qRoot = document.getElementById("questions");
+  const toc = document.getElementById("toc");
+
+  for (const q of QUESTIONS) {
+    const sec = document.createElement("section");
+    sec.className = "q"; sec.id = q.id;
+    sec.innerHTML = `
+      <div class="q-head"><span class="k">${q.id}</span><h2>${q.title}</h2><span class="kind">${q.multi ? "pick many" : "pick one"}</span></div>
+      <p class="body">${q.body}</p>
+      <ul class="opts">
+        ${q.options.map(o => `
+          <li><label class="opt">
+            <input type="${q.multi ? "checkbox" : "radio"}" name="${q.id}" value="${o.v}">
+            <span><span class="t">${o.t}</span>${o.rec ? '<span class="rec">recommended</span>' : ""}<br><span class="d">${o.d}</span></span>
+          </label></li>`).join("")}
+      </ul>
+      <div class="note"><label for="${q.id}-note">Note (optional)</label><textarea id="${q.id}-note" rows="1" placeholder="Anything the options miss"></textarea></div>`;
+    qRoot.appendChild(sec);
+
+    const li = document.createElement("li");
+    li.innerHTML = `<a href="#${q.id}" data-q="${q.id}"><span class="k">${q.id}</span><span>${q.title}</span><span class="dot"></span></a>`;
+    toc.appendChild(li);
+
+    sec.querySelectorAll("input").forEach(inp => inp.addEventListener("change", () => {
+      const checked = [...sec.querySelectorAll("input:checked")].map(i => i.value);
+      state[q.id].picks = checked; save(); render();
+    }));
+    sec.querySelector("textarea").addEventListener("input", e => { state[q.id].note = e.target.value; save(); render(); });
+  }
+
+  function applyState() {
+    for (const q of QUESTIONS) {
+      const sec = document.getElementById(q.id);
+      sec.querySelectorAll("input").forEach(i => { i.checked = state[q.id].picks.includes(i.value); });
+      sec.querySelector("textarea").value = state[q.id].note;
+    }
+  }
+
+  function compile() {
+    const lines = ["{{SUBJECT}} — round {{ROUND}} answers", ""];
+    for (const q of QUESTIONS) {
+      const s = state[q.id];
+      const chosen = q.options.filter(o => s.picks.includes(o.v));
+      let ans = chosen.length ? chosen.map(o => o.t).join("; ") : "(unanswered)";
+      lines.push(`${q.id} ${q.title}: ${ans}`);
+      if (s.note.trim()) lines.push(`    note: ${s.note.trim().replace(/\n+/g, " ")}`);
+    }
+    return lines.join("\n");
+  }
+
+  function render() {
+    document.getElementById("output").value = compile();
+    let done = 0;
+    for (const q of QUESTIONS) {
+      const ok = state[q.id].picks.length > 0;
+      if (ok) done++;
+      document.querySelector(`.toc a[data-q="${q.id}"]`).classList.toggle("done", ok);
+    }
+    document.getElementById("cnt").textContent = `${done} / ${QUESTIONS.length} answered`;
+    document.getElementById("prog").style.width = (done / QUESTIONS.length * 100) + "%";
+  }
+
+  const status = document.getElementById("status");
+  document.getElementById("copy").addEventListener("click", async () => {
+    const text = compile();
+    try {
+      await navigator.clipboard.writeText(text);
+      status.textContent = "Copied"; status.className = "status ok";
+    } catch (e) {
+      const ta = document.getElementById("output"); ta.focus(); ta.select();
+      status.textContent = "Select-all and copy manually"; status.className = "status";
+    }
+    setTimeout(() => { status.textContent = ""; }, 2500);
+  });
+  document.getElementById("reset").addEventListener("click", () => {
+    Object.assign(state, defaults()); save(); applyState(); render();
+    status.textContent = "Reset"; status.className = "status"; setTimeout(() => { status.textContent = ""; }, 2000);
+  });
+
+  applyState(); render();
+</script>
