@@ -90,6 +90,16 @@
 
   main { display: flex; flex-direction: column; gap: 28px; min-width: 0; }
 
+  .fig { margin: 0 0 14px; display: grid; gap: 4px; min-width: 0; }
+  .fig figcaption { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+  .fig pre { margin: 0; background: var(--code); border: 1px solid var(--line-2); border-radius: 5px; padding: 12px 14px; font-size: 12.5px; line-height: 1.45; white-space: pre; overflow-x: auto; color: var(--ink); }
+  .opt > span { min-width: 0; }
+  .opt .fig { margin: 8px 0 0; }
+
+  .overview { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 20px 22px 6px; }
+  .overview h2 { font-family: var(--cond); font-size: 21px; font-weight: 600; margin: 0 0 4px; }
+  .overview p.body { margin: 0 0 14px; color: var(--ink-2); max-width: 66ch; }
+
   .facts { background: var(--fact); color: var(--fact-ink); border-radius: 6px; padding: 16px 18px; }
   .facts h2 { font-family: var(--cond); font-size: 16px; margin: 0 0 8px; font-weight: 600; letter-spacing: 0.01em; }
   .facts ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; }
@@ -149,6 +159,9 @@
   </nav>
 
   <main>
+    <!-- OVERVIEW: rendered from the OVERVIEW constant below; set it to null to drop the section. -->
+    <section class="overview" id="overview"></section>
+
     <section class="facts">
       <h2>Facts already settled from the codebase</h2>
       <ul>
@@ -179,14 +192,28 @@
 </div>
 
 <script>
+  // Figure: { kind: "ascii" | "code", lang?: "ts", caption: "...", text: `...` }. `text` is a template
+  // literal, so escape backticks and `${` inside it; HTML in it is escaped on render.
+  const OVERVIEW = {
+    title: "{{OVERVIEW TITLE}}",
+    body: "{{How the whole task fits together, one or two sentences.}}",
+    figs: [
+      { kind: "ascii", caption: "{{What the diagram shows}}", text: `{{ASCII diagram}}` },
+    ],
+  };
+
   // QUESTIONS: one entry per frontier question. `rec: true` marks the recommended pick (preselected).
   // `multi: true` renders checkboxes, else radios. Keep ids Q1..Qn matching the chat round.
   const QUESTIONS = [
     {
       id: "Q1", title: "{{QUESTION TITLE}}", multi: false,
       body: "{{Question body. Plain text, no markdown.}}",
+      figs: [
+        { kind: "ascii", caption: "{{What the diagram shows}}", text: `{{ASCII diagram}}` },
+      ],
       options: [
-        { v: "a", t: "{{Option label}}", d: "{{One-line consequence or trade-off.}}", rec: true },
+        { v: "a", t: "{{Option label}}", d: "{{One-line consequence or trade-off.}}", rec: true,
+          fig: { kind: "code", lang: "ts", caption: "{{What this option looks like in code}}", text: `{{code}}` } },
         { v: "b", t: "{{Option label}}", d: "{{One-line consequence or trade-off.}}" },
       ],
     },
@@ -206,6 +233,16 @@
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
 
+  function esc(s) { return s.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]); }
+  function fig(f) {
+    const cap = f.kind === "code" && f.lang ? `${f.lang} · ${f.caption}` : f.caption;
+    return `<figure class="fig"><figcaption>${cap}</figcaption><pre>${esc(f.text.replace(/^\n+|\s+$/g, ""))}</pre></figure>`;
+  }
+
+  const ov = document.getElementById("overview");
+  if (OVERVIEW) ov.innerHTML = `<h2>${OVERVIEW.title}</h2><p class="body">${OVERVIEW.body}</p>${(OVERVIEW.figs || []).map(fig).join("")}`;
+  else ov.remove();
+
   const qRoot = document.getElementById("questions");
   const toc = document.getElementById("toc");
 
@@ -215,11 +252,12 @@
     sec.innerHTML = `
       <div class="q-head"><span class="k">${q.id}</span><h2>${q.title}</h2><span class="kind">${q.multi ? "pick many" : "pick one"}</span></div>
       <p class="body">${q.body}</p>
+      ${(q.figs || []).map(fig).join("")}
       <ul class="opts">
         ${q.options.map(o => `
           <li><label class="opt">
             <input type="${q.multi ? "checkbox" : "radio"}" name="${q.id}" value="${o.v}">
-            <span><span class="t">${o.t}</span>${o.rec ? '<span class="rec">recommended</span>' : ""}<br><span class="d">${o.d}</span></span>
+            <span><span class="t">${o.t}</span>${o.rec ? '<span class="rec">recommended</span>' : ""}<br><span class="d">${o.d}</span>${o.fig ? fig(o.fig) : ""}</span>
           </label></li>`).join("")}
       </ul>
       <div class="note"><label for="${q.id}-note">Note (optional)</label><textarea id="${q.id}-note" rows="1" placeholder="Anything the options miss"></textarea></div>`;

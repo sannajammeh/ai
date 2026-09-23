@@ -13,6 +13,6 @@ npx skills add sannajammeh/ai --skill <name> -g
 | `hq` | One digest across every origin of a superrepo: trackers, wayfinder maps, frontier, worktrees. Bun script in `skills/hq/scripts/hq.ts`. |
 | `qc` | Ultra-compressed Conventional Commits generator. |
 | `security-audit` | Security review of a JS/TS codebase, domain by domain. |
-| `visualize-grilling` | Publish a `grilling` round as an interactive decision sheet Artifact; answers paste back into chat. |
+| `visualize-grilling` | Publish a `grilling` round as an interactive decision sheet Artifact with ASCII diagrams and code examples; answers paste back into chat. |
 
 Layout per skill: `SKILL.md` plus optional `references/`, `assets/`, `scripts/`, `evals/` (see `CLAUDE.md`).

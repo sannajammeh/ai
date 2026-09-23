@@ -40,12 +40,14 @@ Uppercase utility text carries `letter-spacing: 0.06em` to `0.08em`. Headings us
 - Page: `max-width 1100px`, grid `200px | 1fr`, `gap 40px`, padding `32px 24px 120px` (bottom padding clears the fixed bar). Under 800px it collapses to one column and the TOC unsticks.
 - Header spans both columns, bottom border `--line`.
 - Left column: sticky TOC (`top 24px`) listing Q ids + titles, a 7px dot per question that turns `--ok` when answered, a divider, then a link to the compiled answers.
-- Main column: vertical stack, `gap 28px`: facts panel → question cards → output card.
+- Main column: vertical stack, `gap 28px`: overview → facts panel → question cards → output card.
 - Fixed bottom bar: answered counter (mono, tabular-nums), 4px progress bar (`--line-2` track, `--accent` fill, max 320px), "Jump to answers" link right-aligned.
 
 ## Components
 
 - **Facts panel**: `--fact` ground, 6px radius, 16/18px padding, bullet list 14px. No border.
+- **Overview**: same card as a question (`--panel`, 1px `--line` border, 6px radius), condensed 21px `h2`, body copy, then its figures. Dropped when `OVERVIEW` is `null`.
+- **Figure**: `figure.fig`, caption above in mono 11px uppercase `--ink-3` (prefixed `lang ·` for code), then `pre` on `--code` ground, 1px `--line-2` border, 5px radius, padding `12px 14px`, mono 12.5px / 1.45, `white-space: pre`, horizontal scroll inside the card. Sits between a question's body and its options, or under an option's description (8px top margin).
 - **Question card**: `--panel`, 1px `--line` border, 6px radius, padding `20px 22px 18px`. Head row: Q id (mono, accent) · title (condensed 21px) · kind label (mono uppercase, right-aligned).
 - **Option**: grid `18px | 1fr`, gap 12px, padding `10px 12px`, 1px `--line-2` border, 5px radius. Hover → `--line`. Checked → `--accent` border + `--accent-soft` fill. Focus-visible → 2px accent outline. Native checkbox/radio with `accent-color`.
 - **Recommended badge**: mono 10.5px uppercase, 1px accent border, 3px radius, inline after the label.
