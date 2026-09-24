@@ -1,7 +1,6 @@
 ---
 name: hq
-description: Orient across every origin of a superrepo from one digest (trackers, wayfinder maps, frontier, worktrees) instead of reading each repo's docs and querying each tracker.
-disable-model-invocation: true
+description: Orient across every origin of a superrepo from one digest (trackers, wayfinder maps, frontier, worktrees) instead of reading each repo's docs and querying each tracker. Use when starting a new task in an HQ superrepo (a directory holding `origins/` and `worktrees/`), when picking which repo, ticket, or worktree a task belongs to, or when the user asks where things stand across projects.
 ---
 
 One script run orients a session across the whole HQ. It replaces reading each origin's `AGENTS.md`, its `docs/agents/issue-tracker.md`, and every map body just to find out where things stand.
