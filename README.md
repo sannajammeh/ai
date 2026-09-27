@@ -10,6 +10,7 @@ npx skills add sannajammeh/ai --skill <name> -g
 |---|---|
 | `change-summary` | Publish a visual overview of a completed change as an Artifact: mechanism diagram, before/after, commits, what is left to verify. |
 | `checkin-integration` | Implement and talk to the Checkin.no API for event participant syncs. |
+| `deslop` | Strip slop from agent-written code: forwarding wrappers and other layers that add reading cost without behaviour. |
 | `hq` | One digest across every origin of a superrepo: trackers, wayfinder maps, frontier, worktrees. Bun script in `skills/hq/scripts/hq.ts`. |
 | `qc` | Ultra-compressed Conventional Commits generator. |
 | `security-audit` | Security review of a JS/TS codebase, domain by domain. |
