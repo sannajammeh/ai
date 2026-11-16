@@ -11,6 +11,7 @@ npx skills add sannajammeh/ai --skill <name> -g
 | `change-summary` | Publish a visual overview of a completed change as an Artifact: mechanism diagram, before/after, commits, what is left to verify. |
 | `checkin-integration` | Implement and talk to the Checkin.no API for event participant syncs. |
 | `deslop` | Strip slop from agent-written code: forwarding wrappers and other layers that add reading cost without behaviour. |
+| `diagramming` | Diagram a design to a self-contained themed HTML page: D2 for complex flowcharts, system design, and database/entity models; pele (Mermaid) for sequence, state, and the rest. One shared dark theme for both engines; script in `skills/diagramming/scripts/diagramming.mjs`. |
 | `hq` | One digest across every origin of a superrepo: trackers, wayfinder maps, frontier, worktrees. Bun script in `skills/hq/scripts/hq.ts`. |
 | `pele` | Render a visual architecture of a proposed or active solution: Mermaid → pele → themed self-contained HTML page opened in the browser. Bun script in `skills/pele/scripts/pele.mjs`. |
 | `qc` | Ultra-compressed Conventional Commits generator. |
