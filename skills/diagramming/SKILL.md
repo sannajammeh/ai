@@ -1,15 +1,17 @@
 ---
 name: diagramming
 description: >
-  Render diagrams to a self-contained themed HTML page, opened in the browser: D2
-  for complex flowcharts, system design (services, boundaries, data stores), and
-  database/entity modelling (sql_table); pele (Mermaid) for everything else —
-  sequence, state, class, mindmap, gantt, timeline, journey, C4. Use when the user
-  says "diagram this", "visualize the architecture", "show the design/flow",
-  "entity diagram", "ER diagram", "system design diagram", or invokes /diagramming —
+  Render diagrams to a self-contained themed HTML page, or standalone SVG files
+  via `--format svg`, opened in the browser: D2 for complex flowcharts, system
+  design (services, boundaries, data stores), and database/entity modelling
+  (sql_table); pele (Mermaid) for everything else — sequence, state, class,
+  mindmap, gantt, timeline, journey, C4. Use when the user says "diagram this",
+  "visualize the architecture", "show the design/flow", "entity diagram",
+  "ER diagram", "system design diagram", "render as svg", or invokes /diagramming —
   and fire it whenever a proposed or reviewed design deserves a picture. Do NOT use
-  for mermaid destined for markdown or PRs (just write the mermaid), UI mockups, or
-  ASCII sketches.
+  for mermaid destined for markdown or PRs (just write the mermaid), UI mockups,
+  ASCII sketches, or persisting a settled design into an architecture document
+  (that's the architecture skill).
 ---
 
 Give a design a **diagram view**. Two engines behind one workflow: write the source, one script renders every diagram onto the same themed page. The script owns the theme — dark `#0a0a0a`, mono type, accent-coded categories — for both engines, so write content, never page styling.
@@ -50,10 +52,12 @@ Give a design a **diagram view**. Two engines behind one workflow: write the sou
 
    Engine is auto-detected per diagram: a source whose first line is a mermaid type keyword goes pele, anything else goes D2. Force an engine with `--engine d2` or `--engine mermaid`.
 
-4. **Verify.** Exit 0 writes the HTML, opens the browser, prints the path. Done when the page is on screen and matches the design. Exit 1 names the failing diagram with the engine's own error (pele: code, line, column, snippet; D2: line, column) — fix the source and re-run; the HTML is never hand-edited.
+   `--format html` (default) writes one self-contained page and opens it in the browser; `--format svg` writes one standalone themed `.svg` per diagram and opens nothing. In svg mode `--out` is the file path for a single diagram, a directory receiving `<n>-<type>.svg` for several. Reach for svg when the diagram must live inside another artifact — a README, a PR, an architecture file — rather than on screen during iteration.
+
+4. **Verify.** Exit 0 writes the output and prints the path(s) — html: the page opens; svg: one file per diagram, browser untouched. Done when the page is on screen and matches the design. Exit 1 names the failing diagram with the engine's own error (pele: code, line, column, snippet; D2: line, column) — fix the source and re-run; output is never hand-edited.
 
 ## Rules
 
 - The script carries the theme for both engines: pele through its CSS variables, D2 through `--theme=201` plus canvas recolor to `#0a0a0a`, layout TALA with elk fallback, embedded mono font. Sources stay free of page-chrome styling; category accent strokes inside a D2 source (blue client, purple server, green data, red auth) are the one allowed touch.
-- `--out <path>` keeps the HTML at a path instead of a fresh tmpdir — use it when the artifact should outlive the session; `--no-open` writes and prints the path only.
-- The page is self-contained (inline SVG, fonts embedded, no network) and writes nowhere but the tmpdir or `--out`.
+- `--out <path>` keeps the artifact past the session; without it everything lands in a throwaway tmpdir.
+- Output is self-contained (inline SVG, fonts embedded, no network) and writes nowhere but the tmpdir or `--out`. In svg mode the pele theme variables are injected onto the svg root, so the file reads dark-theme on its own.

@@ -4,6 +4,7 @@
  * themed HTML page and open it in the browser.
  *
  *   bun diagramming.mjs '<source>' [more sources…] [--out <path>] [--no-open]
+ *                                      [--format html|svg] [--engine d2|mermaid]
  *   bun diagramming.mjs <<'EOF'        stdin; a lone === line separates diagrams
  *   flowchart TD
  *     A --> B
@@ -23,15 +24,20 @@
  * background, TALA layout when installed (elk fallback), MesloLGS NF embedded
  * when present on disk.
  *
+ * --format html (default) writes one self-contained themed HTML page and opens
+ * it in the browser. --format svg writes one standalone themed .svg per diagram
+ * (browser is not opened): with a single diagram --out is the file path, with
+ * several it is a directory receiving <n>-<type>.svg files.
+ *
  * Exits 1 with the failing engine's own error (pele: code/line/column/snippet;
  * D2: line/column) — fix the source and re-run.
  */
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync, rmSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync, rmSync, statSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const USAGE = `usage: bun diagramming.mjs '<source>' [more sources…] [--out <path>] [--no-open] [--engine d2|mermaid]
+const USAGE = `usage: bun diagramming.mjs '<source>' [more sources…] [--out <path>] [--no-open] [--format html|svg] [--engine d2|mermaid]
    or: bun diagramming.mjs <<'EOF'   (stdin; a lone === line separates diagrams)
 flowchart TD
   A --> B
@@ -86,12 +92,16 @@ function detectEngine(source) {
 // --- args -----------------------------------------------------------------
 
 const argv = process.argv.slice(2);
-const flags = { out: undefined, open: true, engine: undefined };
+const flags = { out: undefined, open: true, engine: undefined, format: "html" };
 const sources = [];
 for (let i = 0; i < argv.length; i++) {
   const a = argv[i];
   if (a === "--out") { flags.out = argv[++i]; if (!flags.out) die("--out needs a path"); }
   else if (a === "--no-open") flags.open = false;
+  else if (a === "--format") {
+    flags.format = argv[++i];
+    if (flags.format !== "html" && flags.format !== "svg") die(`--format must be html or svg`);
+  }
   else if (a === "--engine") {
     flags.engine = argv[++i];
     if (flags.engine !== "d2" && flags.engine !== "mermaid") die(`--engine must be d2 or mermaid`);
@@ -260,11 +270,43 @@ function writeOut() {
   return join(mkdtempSync(join(tmpdir(), "diagramming-")), `diagramming-${results.map((r) => r.type).join("+")}.html`);
 }
 
-const file = writeOut();
-writeFileSync(file, page(results));
+// --- svg output ------------------------------------------------------------
 
-const opener = process.platform === "darwin" ? "open" : process.platform === "linux" ? "xdg-open" : undefined;
-if (flags.open && opener) Bun.spawn([opener, file], { stdout: "ignore", stderr: "inherit" });
-console.log(
-  `${file}  (${results.map((r) => `${r.type} ${r.engine}${r.width ? ` ${r.width}×${r.height}` : ""}`).join(", ")})`,
-);
+const PELE_VARS = `--pele-bg:${THEME.bg};--pele-fg:${THEME.fg};--pele-fg-on-light:#0a0a0a;--pele-fg-on-dark:#ffffff;--pele-muted:${THEME.muted};--pele-line:${THEME.line};--pele-surface:${THEME.card};--pele-surface-alt:${THEME.cardAlt};--pele-border:${THEME.border};--pele-accent:${THEME.accent};--pele-critical:${THEME.critical};`;
+
+// pele's root style resolves its theme through var(--pele-*) with light-theme
+// fallbacks; a standalone file has no page to define them on, so the dark theme
+// values are injected as custom properties on the svg element itself.
+function standalone(result) {
+  if (result.engine !== "pele") return result.svg;
+  return result.svg.replace(`style="`, `style="${PELE_VARS}`, 1);
+}
+
+function svgFiles() {
+  const outIsDir = flags.out && existsSync(flags.out) && statSync(flags.out).isDirectory();
+  if (results.length === 1 && !outIsDir) {
+    const file = flags.out ?? join(mkdtempSync(join(tmpdir(), "diagramming-")), `diagramming-${results[0].type}.svg`);
+    mkdirSync(dirname(file), { recursive: true });
+    return [file];
+  }
+  if (flags.out && existsSync(flags.out) && !statSync(flags.out).isDirectory())
+    die(`--out must be a directory when writing multiple svg files`);
+  const dir = flags.out ?? mkdtempSync(join(tmpdir(), "diagramming-"));
+  mkdirSync(dir, { recursive: true });
+  return results.map((r, i) => join(dir, `${i + 1}-${r.type}.svg`));
+}
+
+const desc = (r) => `${r.type} ${r.engine}${r.width ? ` ${r.width}×${r.height}` : ""}`;
+
+if (flags.format === "svg") {
+  const files = svgFiles();
+  results.forEach((r, i) => writeFileSync(files[i], standalone(r)));
+  console.log(files.map((f, i) => `${f}  (${desc(results[i])})`).join("\n"));
+} else {
+  const file = writeOut();
+  writeFileSync(file, page(results));
+
+  const opener = process.platform === "darwin" ? "open" : process.platform === "linux" ? "xdg-open" : undefined;
+  if (flags.open && opener) Bun.spawn([opener, file], { stdout: "ignore", stderr: "inherit" });
+  console.log(`${file}  (${results.map(desc).join(", ")})`);
+}
